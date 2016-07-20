@@ -7,7 +7,6 @@ try:
 except ImportError:
     from datetime import datetime as compatible_datetime
 from datetime import datetime
-from django.apps import apps
 from django.http import QueryDict, HttpResponse, HttpResponseRedirect
 from django.conf import settings
 import django.contrib.auth
@@ -41,7 +40,7 @@ def get_profile_model():
     profile_string = getattr(settings, 'AUTH_PROFILE_MODULE', None)
     if profile_string:
         app_label, model_label = profile_string.split('.')
-        model = apps.get_model(app_label, model_label)
+        model = models.get_model(app_label, model_label)
     return model
 
 
@@ -298,7 +297,7 @@ def next_redirect(request, default='/', additional_params=None,
     # get the redirect url
     if not redirect_url:
         for key in next_key:
-            redirect_url = request.POST.get(key, request.GET.get(key))
+            redirect_url = request.REQUEST.get(key)
             if redirect_url:
                 break
         if not redirect_url:
@@ -697,25 +696,7 @@ def get_profile(user):
     Get profile
     '''
     if django_version >= (1, 7, 0):
-        profile = get_profile_from_user(user)
+        profile = user.facebookprofile
     else:
         profile = user.get_profile()
     return profile
-
-
-def get_profile_from_user(user):
-    '''
-    Tries to get the profile according to the
-    class configured on AUTH_PROFILE_MODULE
-    '''
-    for field in user._meta.get_fields():
-        try:
-            if hasattr(user, field.name):
-                attribute = getattr(user, field.name)
-                if get_profile_model() == type(attribute):
-                    return attribute
-        except Exception:
-            logger.exception("Error getting profile attribute from user.")
-
-    logger.info("Could not find profile attribute.")
-    return None

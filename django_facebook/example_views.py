@@ -1,8 +1,9 @@
 from django.contrib import messages
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render_to_response
+from django.template.context import RequestContext
 from django.views.decorators.csrf import csrf_protect
-from django_facebook.api import get_persistent_graph
+from django_facebook.api import get_persistent_graph, require_persistent_graph
 from django_facebook.decorators import facebook_required_lazy, facebook_required
 from django_facebook.utils import next_redirect, parse_signed_request
 
@@ -68,19 +69,18 @@ def canvas(request, graph):
     Canvas pages require redirects to work using javascript instead of http headers
     The facebook required and facebook required lazy decorator abstract this away
     '''
+    context = RequestContext(request)
     signed_request_string = request.POST.get('signed_request')
-
     signed_request = {}
     if signed_request_string:
         signed_request = parse_signed_request(signed_request_string)
-
+    context['signed_request'] = signed_request
     likes = []
     if graph:
         likes = graph.get('me/likes')['data']
+    context['likes'] = likes
 
-    context = {'signed_request': signed_request, 'likes': likes}
-
-    return render(request, 'django_facebook/canvas.html', context)
+    return render_to_response('django_facebook/canvas.html', context)
 
 
 @facebook_required_lazy(page_tab=True)
@@ -89,12 +89,12 @@ def page_tab(request, graph):
     Example of a simple page tab
     '''
     # get signed_request
-
+    context = RequestContext(request)
     signed_request_string = request.POST['signed_request']
     signed_request = parse_signed_request(signed_request_string)
-    context = {'signed_request': signed_request}
+    context['signed_request'] = signed_request
 
-    return render(request, 'django_facebook/page_tab.html', context)
+    return render_to_response('django_facebook/page_tab.html', context)
 
 
 @facebook_required(scope='publish_stream')
