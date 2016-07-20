@@ -11,6 +11,8 @@ FACEBOOK_APP_SECRET = getattr(settings, 'FACEBOOK_APP_SECRET', None)
 FACEBOOK_DEFAULT_SCOPE = getattr(settings, 'FACEBOOK_DEFAULT_SCOPE', [
     'email', 'user_about_me', 'user_birthday', 'user_website'])
 
+# : Which Facebook Graph API Version should we use
+FACEBOOK_API_VERSION = getattr(settings, 'FACEBOOK_API_VERSION', 'v2.7')
 # : If we should store likes
 FACEBOOK_STORE_LIKES = getattr(settings, 'FACEBOOK_STORE_LIKES', False)
 # : If we should store friends
