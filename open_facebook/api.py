@@ -423,7 +423,7 @@ class FacebookAuthorization(FacebookConnection):
         kwargs = cls._client_info()
         kwargs['code'] = code
         kwargs['redirect_uri'] = redirect_uri
-        response = cls.request(facebook_settings.FACEBOOK_API_VERSION + '/oauth/access_token', **kwargs)
+        response = cls.request('oauth/access_token', **kwargs)
         return response
 
     @classmethod
@@ -446,7 +446,7 @@ class FacebookAuthorization(FacebookConnection):
         kwargs = cls._client_info()
         kwargs['grant_type'] = 'fb_exchange_token'
         kwargs['fb_exchange_token'] = access_token
-        response = cls.request(facebook_settings.FACEBOOK_API_VERSION + '/oauth/access_token', **kwargs)
+        response = cls.request('oauth/access_token', **kwargs)
         return response
 
     @classmethod
@@ -508,7 +508,7 @@ class FacebookAuthorization(FacebookConnection):
             'client_id': facebook_settings.FACEBOOK_APP_ID,
             'client_secret': facebook_settings.FACEBOOK_APP_SECRET,
         }
-        response = cls.request(facebook_settings.FACEBOOK_API_VERSION + '/oauth/access_token', **kwargs)
+        response = cls.request('oauth/access_token', **kwargs)
         return response['access_token']
 
     @memoized
@@ -671,7 +671,7 @@ class OpenFacebook(FacebookConnection):
         self.current_user_id = current_user_id
 
         if version is None:
-            version = facebook_settings.FACEBOOK_API_VERSION
+            version = 'v2.1'
         self.version = version
 
     def __getstate__(self):
